@@ -1,0 +1,14 @@
+[Unit]
+Description=BuddyBot - VK to Discord Bot
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node index.js
+ExecReload=/usr/bin/node index.js
+WorkingDirectory=/opt/buddybot/
+KillMode=process
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
