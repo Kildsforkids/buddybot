@@ -13,8 +13,12 @@ const hook = new WebhookClient(HOOK_ID, HOOK_TOKEN)
 const VK = process.env.VK
 const GROUP_ID = process.env.GROUP_ID
 
+process.on('unhandledRejection', function(err) {
+  console.log(err)
+})
+
 app.get('/', (req, res) => {
-  res.end('<h1>Home page</h1>')
+  res.end('<h1>Hello from BuddyBot!</h1>')
 })
 
 app.listen(PORT, () => {
@@ -41,41 +45,45 @@ axios.get(`https://api.vk.com/method/groups.getLongPollServer?group_id=${GROUP_I
             const text = element.object.text
             const media = []
             const attachments = element.object.attachments
-            attachments.forEach(element => {
-              if (element.type === 'photo') {
-                const sizes = element.photo.sizes
-                let preview = sizes.find(s => s.type === 'w')
-                if (preview) media.push(preview.url)
-                else {
-                  preview = sizes.find(s => s.type === 'z')
+            if (attachments) {
+              attachments.forEach(element => {
+                if (element.type === 'photo') {
+                  const sizes = element.photo.sizes
+                  let preview = sizes.find(s => s.type === 'w')
                   if (preview) media.push(preview.url)
                   else {
-                    preview = sizes.find(s => s.type === 'y')
+                    preview = sizes.find(s => s.type === 'z')
                     if (preview) media.push(preview.url)
                     else {
-                      preview = sizes.find(s => s.type === 'x')
+                      preview = sizes.find(s => s.type === 'y')
                       if (preview) media.push(preview.url)
                       else {
-                        preview = sizes.find(s => s.type === 'm')
+                        preview = sizes.find(s => s.type === 'x')
                         if (preview) media.push(preview.url)
                         else {
-                          media.push(sizes[0].url)
+                          preview = sizes.find(s => s.type === 'm')
+                          if (preview) media.push(preview.url)
+                          else {
+                            media.push(sizes[0].url)
+                          }
                         }
                       }
                     }
                   }
                 }
-              }
-            })
+              })
+            }
 
-            const embed = new MessageEmbed()
+            if (text) {
+              const embed = new MessageEmbed()
               .setTitle('FABLAB ВГУЭС | Цифровая лаборатория')
               .setDescription(text)
               .setColor('ORANGE')
               .setURL(`https://vk.com/club${GROUP_ID}`)
 
-            hook.send(embed)
-            
+              hook.send(embed)
+            }
+
             media.forEach(m => {
               const newEmbed = new MessageEmbed()
                 .setColor('ORANGE')
